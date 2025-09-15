@@ -24,7 +24,7 @@ export default function ProductsPage() {
 
     const activeTabClasses =
     "border-b-2 border-[#004d66] text-[#004d66] font-semibold";
-  const inactiveTabClasses = "text-gray-600 hover:text-gray-800";
+  const inactiveTabClasses = "text-gray-500 hover:text-gray-800";
 
   return (
     <div className="flex h-auto bg-gray-100">
