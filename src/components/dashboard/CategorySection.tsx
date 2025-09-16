@@ -186,7 +186,8 @@ export default function CategorySection() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => setFormData({ id: "", name: "" })}>
-                <Plus className="lg:mr-2 h-4 w-4" /> <span className="">Add Category</span>
+                <Plus className="h-4 w-4" />
+                <span className="hidden lg:inline ml-2">Add Category</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

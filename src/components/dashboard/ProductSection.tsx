@@ -308,7 +308,7 @@ export default function ProductSection() {
   };
 
   return (
-    <div className="flex-1 p-6">
+    <div className="flex-1 p-2">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Products</CardTitle>
@@ -329,8 +329,8 @@ export default function ProductSection() {
                   })
                 }
               >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Product
+                <Plus className="h-4 w-4" />
+                <span className="hidden lg:inline ml-2">Add Product</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -340,7 +340,7 @@ export default function ProductSection() {
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
                   <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <Input
@@ -456,12 +456,15 @@ export default function ProductSection() {
           </Dialog>
         </CardHeader>
         <CardContent>
-          <Table>
+          <div className="max-w-[260px] md:max-w-full overflow-auto">
+            <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Image</TableHead>
+                {/* Hide Image column on mobile */}
+                <TableHead className="hidden md:table-cell">Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
+                {/* Hide Category column on mobile */}
+                <TableHead className="hidden md:table-cell">Category</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -483,7 +486,8 @@ export default function ProductSection() {
               ) : (
                 products.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell>
+                    {/* Hide Image on mobile */}
+                    <TableCell className="hidden md:table-cell">
                       {product.images?.[0] ? (
                         <img
                           src={product.images[0]}
@@ -497,7 +501,8 @@ export default function ProductSection() {
                     <TableCell className="font-medium">
                       {product.name}
                     </TableCell>
-                    <TableCell>{product.category_name}</TableCell>
+                    {/* Hide Category on mobile */}
+                    <TableCell className="hidden md:table-cell">{product.category_name}</TableCell>
                     <TableCell>Ksh {product.price.toLocaleString()}</TableCell>
                     <TableCell>{product.quantity}</TableCell>
                     <TableCell className="text-right">
@@ -527,6 +532,8 @@ export default function ProductSection() {
               )}
             </TableBody>
           </Table>
+          </div>
+          
         </CardContent>
       </Card>
 
@@ -544,9 +551,10 @@ export default function ProductSection() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-            className="bg-red-500 cursor-pointer"
-            onClick={handleDelete}>
+            <AlertDialogAction
+              className="bg-red-500 cursor-pointer"
+              onClick={handleDelete}
+            >
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>
