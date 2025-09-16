@@ -62,7 +62,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-white shadow-md flex-col fixed inset-y-0 left-0">
         <div className="px-6 py-4 text-2xl font-bold text-[#004d66] border-b border-black/10">
@@ -166,7 +166,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </header>
 
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>
   );
