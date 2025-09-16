@@ -170,7 +170,7 @@ export default function ProductSection() {
     const body = JSON.stringify({
       id: formData.id || undefined,
       name: formData.name,
-      category_id: formData.category_id,
+      category_id: Number(formData.category_id),
       price: formData.price,
       quantity: formData.quantity,
       brand: formData.brand || null,
@@ -253,7 +253,7 @@ export default function ProductSection() {
     setFormData({
       id: product.id,
       name: product.name,
-      category_id: product.category_id,
+      category_id: String(product.category_id),
       price: product.price,
       quantity: product.quantity,
       brand: product.brand || "",
@@ -365,7 +365,7 @@ export default function ProductSection() {
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
+                          <SelectItem key={category.id} value={String(category.id)}>
                             {category.name}
                           </SelectItem>
                         ))}
