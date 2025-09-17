@@ -181,12 +181,12 @@ export default function OrdersPage() {
                         <TableCell>{order.shipping_address}</TableCell>
                         <TableCell>Ksh {order.total_amount.toLocaleString()}</TableCell>
                         <TableCell>
-                          <Badge className="p-2" variant={order.order_status === "delivered" ? "default" : "secondary"}>
+                          <Badge className="p-1" variant={order.order_status === "delivered" ? "default" : "secondary"}>
                             {order.order_status}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge className="p-2" variant={order.payment_status === "paid" ? "default" : "destructive"}>
+                          <Badge className="p-1" variant={order.payment_status === "paid" ? "default" : "destructive"}>
                             {order.payment_status}
                           </Badge>
                         </TableCell>
@@ -270,12 +270,12 @@ export default function OrdersPage() {
                   <p className="text-xs text-gray-800 mb-2">{order.shipping_address}</p>
                   <p className="text-sm font-semibold text-[#004d66]">Ksh {order.total_amount.toLocaleString()}</p>
                   <div className="flex gap-2 mt-2">
-                    <Badge className="p-2" variant={order.order_status === "delivered" ? "default" : "secondary"}>
-                      order: 
+                    <span className="font-medium">Order: </span>
+                    <Badge className="p-1" variant={order.order_status === "delivered" ? "default" : "secondary"}>
                       {order.order_status}
                     </Badge>
-                    <Badge className="p-2" variant={order.payment_status === "paid" ? "default" : "destructive"}>
-                      payment: 
+                    <span className="font-medium">Payment: </span>
+                    <Badge className="p-1" variant={order.payment_status === "paid" ? "default" : "destructive"}>
                       {order.payment_status}
                     </Badge>
                   </div>
