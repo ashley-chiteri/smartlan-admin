@@ -49,7 +49,7 @@ function SettingsPage() {
   const handleEmailUpdate = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${config.API_URL}/auth/change_email.php`, {
+      const res = await fetch(`${config.API_URL}/user/change-email`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +83,7 @@ function SettingsPage() {
   const handlePasswordUpdate = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${config.API_URL}/auth/change_password.php`, {
+      const res = await fetch(`${config.API_URL}/user/change-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

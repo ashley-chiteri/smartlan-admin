@@ -43,7 +43,7 @@ export default function OverviewPage() {
     const fetchOverview = async () => {
       try {
         const token = getToken();
-        const response = await fetch(`${config.API_URL}/dashboard/overview.php`, {
+        const response = await fetch(`${config.API_URL}/overview`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -45,8 +45,15 @@ export default function OrdersPage() {
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
+    const token = getToken();
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/get_orders.php`);
+      const response = await fetch(`${API_BASE_URL}/orders`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch orders.");
       }
@@ -68,13 +75,13 @@ export default function OrdersPage() {
   const handleDeleteOrder = async () => {
     if (!deleteOrderId) return;
     setIsUpdating(true);
+    const token = getToken();
     try {
-      // You would need to create a PHP script for deleting an order (e.g., delete_order.php)
-      // This is a placeholder for the actual API call
-      const response = await fetch(`${API_BASE_URL}/orders/delete_order.php`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${deleteOrderId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: deleteOrderId }),
+        headers: { "Content-Type": "application/json",
+           Authorization: `Bearer ${token}` },
+        //body: JSON.stringify({ id: deleteOrderId }),
       });
       if (!response.ok) {
         throw new Error("Failed to delete order.");
@@ -102,8 +109,8 @@ export default function OrdersPage() {
         payment_status: updatedFields.payment_status,
       };
 
-      const response = await fetch(`${API_BASE_URL}/orders/update_order.php`, {
-        method: "POST",
+      const response = await fetch(`${API_BASE_URL}/orders/${payload.order_ref}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, 
@@ -259,7 +266,7 @@ export default function OrdersPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setEditOrder(order)}>Edit Order</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setDeleteOrderId(order.id)}>Delete Order</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setDeleteOrderId( order.id)}>Delete Order</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>

@@ -53,10 +53,22 @@ export default function CategorySection() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
+    const getToken = () => {
+    // Retrieves the auth token from localStorage.
+    return localStorage.getItem("authToken");
+  };
+
   const fetchCategories = useCallback(async () => {
     setIsFetching(true);
+
     try {
-      const response = await fetch(`${config.API_URL}/categories/list.php`);
+      const response = await fetch(`${config.API_URL}/categories`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch categories");
       }
@@ -78,10 +90,7 @@ export default function CategorySection() {
     setFormData({ ...formData, name: e.target.value });
   };
 
-  const getToken = () => {
-    // Retrieves the auth token from localStorage.
-    return localStorage.getItem("authToken");
-  };
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -93,14 +102,11 @@ export default function CategorySection() {
       return;
     }
 
-    const url = formData.id
-      ? `${config.API_URL}/categories/update.php`
-      : `${config.API_URL}/categories/create.php`;
-    const method = "POST";
+    const method = formData.id ? "PUT" : "POST";
     const body = JSON.stringify(formData);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(`${config.API_URL}/categories`, {
         method: method,
         headers: {
           "Content-Type": "application/json",
@@ -153,13 +159,13 @@ export default function CategorySection() {
     }
 
     try {
-      const response = await fetch(`${config.API_URL}/categories/delete.php`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ id: categoryToDelete }),
+      const response = await fetch(`${config.API_URL}/categories`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id: categoryToDelete }),
       });
 
       if (!response.ok) {

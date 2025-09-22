@@ -97,7 +97,13 @@ export default function ProductSection() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await fetch(`${config.API_URL}/categories/list.php`);
+      const response = await fetch(`${config.API_URL}/categories`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch categories");
       const data = await response.json();
       setCategories(data);
@@ -109,7 +115,13 @@ export default function ProductSection() {
   const fetchProducts = useCallback(async () => {
     setIsFetching(true);
     try {
-      const response = await fetch(`${config.API_URL}/products/list.php`);
+      const response = await fetch(`${config.API_URL}/products`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
       setProducts(data);
@@ -164,9 +176,8 @@ export default function ProductSection() {
       return;
     }
 
-    const url = formData.id
-      ? `${config.API_URL}/products/update.php`
-      : `${config.API_URL}/products/create.php`;
+    const url = formData.id ? `${config.API_URL}/products/${formData.id}` : `${config.API_URL}/products/`;
+    const method = formData.id ? "PUT" : "POST";
     const body = JSON.stringify({
       id: formData.id || undefined,
       name: formData.name,
@@ -178,9 +189,10 @@ export default function ProductSection() {
       featured: formData.featured,
     });
 
+
     try {
       const response = await fetch(url, {
-        method: "POST",
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -201,11 +213,11 @@ export default function ProductSection() {
           uploadData.append("product_id", productId);
 
           const uploadResponse = await fetch(
-            `${config.API_URL}/products/upload.php`,
+            `${config.API_URL}/products/upload-image`,
             {
               method: "POST",
-              headers: { Authorization: `Bearer ${token}` }, // ✅ keep this
-              body: uploadData, // ✅ FormData will set correct multipart headers
+              headers: { Authorization: `Bearer ${token}` }, 
+              body: uploadData, // FormData will set correct multipart headers
             }
           );
 
@@ -278,8 +290,8 @@ export default function ProductSection() {
     }
 
     try {
-      const response = await fetch(`${config.API_URL}/products/delete.php`, {
-        method: "POST",
+      const response = await fetch(`${config.API_URL}/products/${productToDelete}`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -365,7 +377,10 @@ export default function ProductSection() {
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem key={category.id} value={String(category.id)}>
+                          <SelectItem
+                            key={category.id}
+                            value={String(category.id)}
+                          >
                             {category.name}
                           </SelectItem>
                         ))}
@@ -458,82 +473,89 @@ export default function ProductSection() {
         <CardContent>
           <div className="max-w-[260px] md:max-w-full overflow-auto">
             <Table>
-            <TableHeader>
-              <TableRow>
-                {/* Hide Image column on mobile */}
-                <TableHead className="hidden md:table-cell">Image</TableHead>
-                <TableHead>Name</TableHead>
-                {/* Hide Category column on mobile */}
-                <TableHead className="hidden md:table-cell">Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isFetching ? (
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                  </TableCell>
+                  {/* Hide Image column on mobile */}
+                  <TableHead className="hidden md:table-cell">Image</TableHead>
+                  <TableHead>Name</TableHead>
+                  {/* Hide Category column on mobile */}
+                  <TableHead className="hidden md:table-cell">
+                    Category
+                  </TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : products.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    No products found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                products.map((product) => (
-                  <TableRow key={product.id}>
-                    {/* Hide Image on mobile */}
-                    <TableCell className="hidden md:table-cell">
-                      {product.images?.[0] ? (
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="w-12 h-12 object-scale-down rounded"
-                        />
-                      ) : (
-                        <ImageIcon className="w-12 h-12 text-gray-400" />
-                      )}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {product.name}
-                    </TableCell>
-                    {/* Hide Category on mobile */}
-                    <TableCell className="hidden md:table-cell">{product.category_name}</TableCell>
-                    <TableCell>Ksh {product.price.toLocaleString()}</TableCell>
-                    <TableCell>{product.quantity}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(product)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => confirmDelete(product.id)}
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+              </TableHeader>
+              <TableBody>
+                {isFetching ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : products.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">
+                      No products found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  products.map((product) => (
+                    <TableRow key={product.id}>
+                      {/* Hide Image on mobile */}
+                      <TableCell className="hidden md:table-cell">
+                        {product.images?.[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="w-12 h-12 object-scale-down rounded"
+                          />
+                        ) : (
+                          <ImageIcon className="w-12 h-12 text-gray-400" />
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {product.name}
+                      </TableCell>
+                      {/* Hide Category on mobile */}
+                      <TableCell className="hidden md:table-cell">
+                        {product.category_name}
+                      </TableCell>
+                      <TableCell>
+                        Ksh {product.price.toLocaleString()}
+                      </TableCell>
+                      <TableCell>{product.quantity}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleEdit(product)}
+                            >
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => confirmDelete(product.id)}
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-          
         </CardContent>
       </Card>
 
