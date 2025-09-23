@@ -1,10 +1,10 @@
 // src/config.ts
 const dev = {
-  API_URL: "http://localhost:3000/api",
+  API_URL: "http://localhost/api",
 };
 
 const prod = {
-  API_URL: "https://api.smartlan.co.ke/api",
+  API_URL: "https://api.smartlan.co.ke",
 };
 
 export const config = process.env.NODE_ENV === "development" ? dev : prod;

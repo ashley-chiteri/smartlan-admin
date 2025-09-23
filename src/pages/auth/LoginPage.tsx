@@ -31,7 +31,7 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
 
     try {
-        const response = await fetch(`${config.API_URL}/auth/login`, {
+        const response = await fetch(`${config.API_URL}/auth/login.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

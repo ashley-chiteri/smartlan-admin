@@ -62,13 +62,7 @@ export default function CategorySection() {
     setIsFetching(true);
 
     try {
-      const response = await fetch(`${config.API_URL}/categories`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+       const response = await fetch(`${config.API_URL}/categories/list.php`);
       if (!response.ok) {
         throw new Error("Failed to fetch categories");
       }
@@ -90,8 +84,6 @@ export default function CategorySection() {
     setFormData({ ...formData, name: e.target.value });
   };
 
-
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -102,11 +94,14 @@ export default function CategorySection() {
       return;
     }
 
-    const method = formData.id ? "PUT" : "POST";
+    const url = formData.id
+      ? `${config.API_URL}/categories/update.php`
+      : `${config.API_URL}/categories/create.php`;
+    const method = "POST";
     const body = JSON.stringify(formData);
 
     try {
-      const response = await fetch(`${config.API_URL}/categories`, {
+      const response = await fetch(url, {
         method: method,
         headers: {
           "Content-Type": "application/json",
@@ -159,14 +154,15 @@ export default function CategorySection() {
     }
 
     try {
-      const response = await fetch(`${config.API_URL}/categories`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ id: categoryToDelete }),
+     const response = await fetch(`${config.API_URL}/categories/delete.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: categoryToDelete }),
       });
+
 
       if (!response.ok) {
         throw new Error("Failed to delete category");

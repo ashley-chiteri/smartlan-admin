@@ -32,7 +32,7 @@ export interface Order {
   items: OrderItem[];
 }
 
-const API_BASE_URL = config.API_URL; // Replace with your actual API base URL
+const API_BASE_URL = config.API_URL;
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -45,15 +45,8 @@ export default function OrdersPage() {
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
-    const token = getToken();
     try {
-      const response = await fetch(`${API_BASE_URL}/orders`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, 
-        },
-      });
+      const response = await fetch(`${API_BASE_URL}/orders/get_orders.php`);
       if (!response.ok) {
         throw new Error("Failed to fetch orders.");
       }
@@ -77,11 +70,11 @@ export default function OrdersPage() {
     setIsUpdating(true);
     const token = getToken();
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/${deleteOrderId}`, {
+      const response = await fetch(`${API_BASE_URL}/orders/delete_order.php`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json",
            Authorization: `Bearer ${token}` },
-        //body: JSON.stringify({ id: deleteOrderId }),
+        body: JSON.stringify({ id: deleteOrderId }),
       });
       if (!response.ok) {
         throw new Error("Failed to delete order.");
@@ -109,8 +102,8 @@ export default function OrdersPage() {
         payment_status: updatedFields.payment_status,
       };
 
-      const response = await fetch(`${API_BASE_URL}/orders/${payload.order_ref}`, {
-        method: "PUT",
+      const response = await fetch(`${API_BASE_URL}/orders/update_order.php`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, 

@@ -97,13 +97,7 @@ export default function ProductSection() {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await fetch(`${config.API_URL}/categories`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+      const response = await fetch(`${config.API_URL}/categories/list.php`);
       if (!response.ok) throw new Error("Failed to fetch categories");
       const data = await response.json();
       setCategories(data);
@@ -115,13 +109,7 @@ export default function ProductSection() {
   const fetchProducts = useCallback(async () => {
     setIsFetching(true);
     try {
-      const response = await fetch(`${config.API_URL}/products`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+      const response = await fetch(`${config.API_URL}/products/list.php`);
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
       setProducts(data);
@@ -176,8 +164,9 @@ export default function ProductSection() {
       return;
     }
 
-    const url = formData.id ? `${config.API_URL}/products/${formData.id}` : `${config.API_URL}/products/`;
-    const method = formData.id ? "PUT" : "POST";
+    const url = formData.id
+      ? `${config.API_URL}/products/update.php`
+      : `${config.API_URL}/products/create.php`;
     const body = JSON.stringify({
       id: formData.id || undefined,
       name: formData.name,
@@ -189,10 +178,9 @@ export default function ProductSection() {
       featured: formData.featured,
     });
 
-
     try {
-      const response = await fetch(url, {
-        method: method,
+       const response = await fetch(url, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -213,7 +201,7 @@ export default function ProductSection() {
           uploadData.append("product_id", productId);
 
           const uploadResponse = await fetch(
-            `${config.API_URL}/products/upload-image`,
+            `${config.API_URL}/products/upload.php`,
             {
               method: "POST",
               headers: { Authorization: `Bearer ${token}` }, 
@@ -290,8 +278,8 @@ export default function ProductSection() {
     }
 
     try {
-      const response = await fetch(`${config.API_URL}/products/${productToDelete}`, {
-        method: "DELETE",
+      const response = await fetch(`${config.API_URL}/products/delete.php`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
