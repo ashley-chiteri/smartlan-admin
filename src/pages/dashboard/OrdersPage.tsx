@@ -1,11 +1,38 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, ChevronDown, ChevronUp, MoreHorizontal, MoreVertical } from "lucide-react";
+import {
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  MoreHorizontal,
+  MoreVertical,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import EditOrderDialog from "@/components/dashboard/EditOrderDialog";
 import { toast } from "sonner";
 import { config } from "@/config";
@@ -28,6 +55,8 @@ export interface Order {
   total_amount: number;
   order_status: string;
   payment_status: string;
+  payment_method: string;
+  email_status: string;
   created_at: string;
   items: OrderItem[];
 }
@@ -72,8 +101,10 @@ export default function OrdersPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/orders/delete_order.php`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json",
-           Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ id: deleteOrderId }),
       });
       if (!response.ok) {
@@ -93,7 +124,7 @@ export default function OrdersPage() {
   const handleUpdateOrder = async (updatedFields: Partial<Order>) => {
     if (!editOrder) return;
     setIsUpdating(true);
-     const token = getToken();
+    const token = getToken();
     try {
       // The update_order.php script expects 'order_ref', 'order_status', and 'payment_status'
       const payload = {
@@ -106,7 +137,7 @@ export default function OrdersPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -152,7 +183,9 @@ export default function OrdersPage() {
                   <TableHead>Payment Status</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Items</TableHead>
-                  <TableHead className="w-[100px] text-center">Actions</TableHead>
+                  <TableHead className="w-[100px] text-center">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -172,41 +205,130 @@ export default function OrdersPage() {
                   orders.map((order) => (
                     <>
                       <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.order_ref || order.id.substring(0, 8)}...</TableCell>
+                        <TableCell className="font-medium">
+                          {order.order_ref || order.id.substring(0, 8)}...
+                        </TableCell>
                         <TableCell>
-                          {order.customer_name}<br />
-                          <span className="text-xs text-gray-500">{order.customer_email}</span><br />
-                          <span className="text-xs text-gray-500">{order.customer_phone}</span>
+                          {order.customer_name}
+                          <br />
+                          <span className="text-xs text-gray-500">
+                            {order.customer_email}
+                          </span>
+                          <br />
+                          <span className="text-xs text-gray-500">
+                            {order.customer_phone}
+                          </span>
                         </TableCell>
                         <TableCell>{order.shipping_address}</TableCell>
-                        <TableCell>Ksh {order.total_amount.toLocaleString()}</TableCell>
                         <TableCell>
-                          <Badge className="p-1" variant={order.order_status === "delivered" ? "default" : "secondary"}>
+                          Ksh {order.total_amount.toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className="p-1 mb-1"
+                            variant={
+                              order.order_status === "delivered"
+                                ? "default"
+                                : "secondary"
+                            }
+>
                             {order.order_status}
+                          </Badge><br />
+                           
+                          <Badge className="p-1" variant={order.email_status === "sent" ? "default" : "secondary"}>
+                             email: {order.email_status}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge className="p-1" variant={order.payment_status === "paid" ? "default" : "destructive"}>
+                          <Badge
+                            className="p-1 mb-1"
+                            variant={
+                              order.payment_status === "paid"
+                                ? "default"
+                                : "destructive"
+                            }
+                          >
                             {order.payment_status}
+                          </Badge><br/>
+                          <Badge className="p-1" variant={order.payment_method === "paybill" ? "default" : "secondary"}>
+                            {order.payment_method}
                           </Badge>
                         </TableCell>
-                        <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="sm" onClick={() => toggleExpand(order.id)}>
-                            {expandedOrder === order.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                          {new Date(order.created_at).toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleExpand(order.id)}
+                          >
+                            {expandedOrder === order.id ? (
+                              <ChevronUp size={16} />
+                            ) : (
+                              <ChevronDown size={16} />
+                            )}
                           </Button>
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
                                 <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setEditOrder(order)}>Edit Order</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setDeleteOrderId(order.id)}>Delete Order</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setEditOrder(order)}
+                              >
+                                Edit Order
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setDeleteOrderId(order.id)}
+                              >
+                                Delete Order
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={async () => {
+                                  try {
+                                    const response = await fetch(
+                                      `${API_BASE_URL}/orders/confirm_paybill.php`,
+                                      {
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          Authorization: `Bearer ${getToken()}`,
+                                        },
+                                        body: JSON.stringify({
+                                          order_ref: order.order_ref,
+                                        }),
+                                      }
+                                    );
+
+                                    const result = await response.json();
+                                    if (!response.ok || result.error)
+                                      throw new Error(
+                                        result.error ||
+                                          "Failed to confirm paybill"
+                                      );
+
+                                    toast.success(
+                                      "Paybill order confirmed & email sent"
+                                    );
+                                    fetchOrders();
+                                  } catch (err) {
+                                    toast.error("Error confirming paybill");
+                                    console.error(err);
+                                  }
+                                }}
+                              >
+                                Confirm Paybill
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -218,9 +340,19 @@ export default function OrdersPage() {
                               <p className="font-semibold">Order Items</p>
                               <ul className="space-y-1">
                                 {order.items.map((item) => (
-                                  <li key={item.id} className="flex justify-between text-sm">
-                                    <span>{item.name} × {item.quantity}</span>
-                                    <span>Ksh {(item.price_at_purchase * item.quantity).toLocaleString()}</span>
+                                  <li
+                                    key={item.id}
+                                    className="flex justify-between text-sm"
+                                  >
+                                    <span>
+                                      {item.name} × {item.quantity}
+                                    </span>
+                                    <span>
+                                      Ksh{" "}
+                                      {(
+                                        item.price_at_purchase * item.quantity
+                                      ).toLocaleString()}
+                                    </span>
                                   </li>
                                 ))}
                               </ul>
@@ -245,49 +377,127 @@ export default function OrdersPage() {
               <p className="text-center text-gray-500">No orders found.</p>
             ) : (
               orders.map((order) => (
-                <div key={order.id} className="rounded-xl border p-4 bg-gray-50 shadow-sm">
+                <div
+                  key={order.id}
+                  className="rounded-xl border p-4 bg-gray-50 shadow-sm"
+                >
                   <div className="flex justify-between items-center mb-2">
-                    <p className="font-bold">#{order.order_ref || order.id.substring(0, 8)}</p>
+                    <p className="font-bold">
+                      #{order.order_ref || order.id.substring(0, 8)}
+                    </p>
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs text-gray-500">{new Date(order.created_at).toLocaleString()}</span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(order.created_at).toLocaleString()}
+                      </span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
                             <span className="sr-only">Open menu</span>
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setEditOrder(order)}>Edit Order</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setDeleteOrderId( order.id)}>Delete Order</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setEditOrder(order)}>
+                            Edit Order
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setDeleteOrderId(order.id)}
+                          >
+                            Delete Order
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </div>
                   <p className="text-sm font-medium">{order.customer_name}</p>
-                  <p className="text-xs text-gray-500 mb-2">{order.customer_email}</p>
-                  <p className="text-xs text-gray-500 mb-2">{order.customer_phone}</p>
-                  <p className="text-xs text-gray-800 mb-2">{order.shipping_address}</p>
-                  <p className="text-sm font-semibold text-[#004d66]">Ksh {order.total_amount.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 mb-2">
+                    {order.customer_email}
+                  </p>
+                  <p className="text-xs text-gray-500 mb-2">
+                    {order.customer_phone}
+                  </p>
+                  <p className="text-xs text-gray-800 mb-2">
+                    {order.shipping_address}
+                  </p>
+                  <p className="text-sm font-semibold text-[#004d66]">
+                    Ksh {order.total_amount.toLocaleString()}
+                  </p>
                   <div className="flex gap-2 mt-2">
                     <span className="font-medium">Order: </span>
-                    <Badge className="p-1" variant={order.order_status === "delivered" ? "default" : "secondary"}>
+                    <Badge
+                      className="p-1"
+                      variant={
+                        order.order_status === "delivered"
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
                       {order.order_status}
                     </Badge>
                     <span className="font-medium">Payment: </span>
-                    <Badge className="p-1" variant={order.payment_status === "paid" ? "default" : "destructive"}>
+                    <Badge
+                      className="p-1"
+                      variant={
+                        order.payment_status === "paid"
+                          ? "default"
+                          : "destructive"
+                      }
+                    >
                       {order.payment_status}
                     </Badge>
                   </div>
-                  <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => toggleExpand(order.id)}>
+                   <div className="flex gap-2 mt-2">
+                    <span className="font-medium">email: </span>
+                    <Badge
+                      className="p-1"
+                      variant={
+                        order.email_status === "sent"
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {order.email_status}
+                    </Badge>
+                    
+                    <Badge
+                      className="p-1 "
+                      variant={
+                        order.payment_method === "paybill"
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {order.payment_method}
+                    </Badge>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 w-full"
+                    onClick={() => toggleExpand(order.id)}
+                  >
                     {expandedOrder === order.id ? "Hide Items" : "View Items"}
                   </Button>
                   {expandedOrder === order.id && (
                     <div className="mt-3 space-y-1 text-sm">
                       {order.items.map((item) => (
-                        <div key={item.id} className="flex justify-between border-b pb-1">
-                          <span>{item.name} × {item.quantity}</span>
-                          <span>Ksh {(item.price_at_purchase * item.quantity).toLocaleString()}</span>
+                        <div
+                          key={item.id}
+                          className="flex justify-between border-b pb-1"
+                        >
+                          <span>
+                            {item.name} × {item.quantity}
+                          </span>
+                          <span>
+                            Ksh{" "}
+                            {(
+                              item.price_at_purchase * item.quantity
+                            ).toLocaleString()}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -298,19 +508,26 @@ export default function OrdersPage() {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteOrderId} onOpenChange={(open) => !open && setDeleteOrderId(null)}>
+      <AlertDialog
+        open={!!deleteOrderId}
+        onOpenChange={(open) => !open && setDeleteOrderId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the order and all related data.
+              This action cannot be undone. This will permanently delete the
+              order and all related data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteOrder} disabled={isUpdating}>
+            <AlertDialogAction
+              onClick={handleDeleteOrder}
+              disabled={isUpdating}
+            >
               {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Continue
             </AlertDialogAction>
